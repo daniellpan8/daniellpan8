@@ -34,7 +34,7 @@
 
 	    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
 	    camera.position.set(0, 20, 100);
-	    camera.position.set(1, 2, 1);
+	    camera.position.set(1, 4, 1);
 	    
 
 	    //renderer.domElement.addEventListener('mousemove', onMouseMove);
@@ -69,7 +69,7 @@
 
 	    //orbit controls
 	    const controls = new OrbitControls(camera, renderer.domElement);
-	    controls.target.set(0, 2, 0);
+	    controls.target.set(0, 4, 0);
 	    controls.autoRotate = true;
 	    controls.autoRotateSpeed = 0.5;
 	    controls.enableDamping = true;
