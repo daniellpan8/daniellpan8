@@ -122,7 +122,8 @@
 	    scene.add(light4);
 
 	    var lightGeometry = new THREE.SphereGeometry(0.3, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
-		const lightMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff } );
+	const lightMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff, metalness: 1, roughness: 0, envMap: texture, envMapIntensity: 1} );
+
 		var lightSphere = new THREE.Mesh(lightGeometry, lightMaterial);
 		lightSphere.position.set(0, 30, 0);
 	    scene.add(lightSphere);
