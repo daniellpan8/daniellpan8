@@ -108,8 +108,9 @@
 
 		loader.load('faceScan2.glb', function(g) {
 			const face = g.scene;
-    		face.scale.set(5,5,5);
-    		face.position.set(20, 20, 20);
+    		face.scale.set(15,15,15);
+    		face.position.set(0, 0, 10);
+    		face.rotation.z = Math.PI;
     		face.traverse((node) => {
         		if (node.isMesh) {
             		node.castShadow = true;
