@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+  	<meta charset="utf-8">
+  	<title>Pan's Bedroom?</title>
+  	<style>
+    	
+    	body { 
+    		margin: 0; 
+    		overflow: hidden;
+    		display: flex;
+  			justify-content: center;
+  			
+    	}
+    	canvas { width: 100%; height: 100%; }
+    	#button1 {
+    		position: absolute;
+    		color: #0000ff;
+    		top: 2rem;
+    	}
+    	
+		@media only screen and (max-width: 1000px) {
+			canvas {
+				height: 100%;
+			}
+			#button1 {
+				display: none;
+			}
+		}
+  	</style>
+</head>
+<body>
+	<button id="button1">CLICK FOR FIRST PERSON VIEW</button>
+
+  	<script type="module">
+
+	    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js';
+	    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js';
+	    import { RGBELoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/RGBELoader.js';
+	    import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/GLTFLoader.js';
+	    import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/PointerLockControls.js';
+
+	    const renderer = new THREE.WebGLRenderer();
+	    renderer.setSize(window.innerWidth, window.innerHeight);
+	    
+	    
+
+	    const scene = new THREE.Scene();
+	    scene.background = new THREE.Color(0x87ceeb);
+
+
+	    //scene. fog = new THREE. Fog( 0xffffff, 0.015, 100 );
+
+	    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+	    
+	    camera.position.set(3, 10, 3);
+	    
+
+	    //renderer.domElement.addEventListener('mousemove', onMouseMove);
+//renderer.domElement.addEventListener('mouseleave', onMouseLeave);
+/*
+	    const textureLoader = new THREE.TextureLoader();
+		const texture = textureLoader.load('https://cdn.polyhaven.com/asset_img/primary/christmas_photo_studio_06.png?height=780', function(texture) {
+			texture.mapping = THREE.EquirectangularReflectionMapping;
+			texture.encoding = THREE.sRGBEncoding;
+		});
+
+		scene.background = texture;
+		scene.environment = texture;
+
+*/
+
+/*
+		const textureLoader = new THREE.TextureLoader();
+		//const texture = textureLoader.load('https://dl.polyhaven.org/file/ph-assets/HDRIs/extra/Tonemapped%20JPG/workshop.jpg');
+		//const texture = textureLoader.load('https://cdn.polyhaven.com/asset_img/primary/christmas_photo_studio_06.png?height=780');
+		const texture = textureLoader.load('https://dl.polyhaven.org/file/ph-assets/HDRIs/extra/Tonemapped%20JPG/sunflowers_puresky.jpg');
+
+		texture.mapping = THREE.EquirectangularReflectionMapping;
+		texture.encoding = THREE.sRGBEncoding;
+		texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+		texture.wrapS = THREE.RepeatWrapping;
+		texture.repeat.set(2, 1);
+		scene.background = texture;
+		scene.environment = texture;
+*/
+
+	    
+
+	    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+	    renderer.toneMappingExposure = 1.0;
+	    renderer.shadowMap.enabled = true;
+	    renderer.shadowMap.type = THREE.BasicShadowMap;
+	    document.body.appendChild(renderer.domElement);
+
+	    //orbit controls
+	    /*
+	    const controls = new OrbitControls(camera, renderer.domElement);
+	    controls.target.set(0, 10, 0);
+	    controls.autoRotate = true;
+	    controls.autoRotateSpeed = 0.5;
+	    controls.enableDamping = true;
+	    */
+	    //controls.maxDistance = 11;
+
+	    //controls.enablePan = false;
+	    //fps
+	    //detects if mobile
+	    function isMobileDevice() {
+    		return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+		}
+
+	    let controls;
+
+	    if (isMobileDevice()) {
+	    	controls = new OrbitControls(camera, renderer.domElement);
+	    	controls.target.set(0, 10, 0);
+		    controls.autoRotate = true;
+		    controls.autoRotateSpeed = 0.5;
+		    controls.enableDamping = true;
+	    } else {
+	    	controls = new PointerLockControls(camera, renderer.domElement);
+	    }
+
+	    
+	    //controls.lock();
+	    let clock = new THREE.Clock();
+
+	    const button = document.querySelector('#button1');
+	    button.addEventListener('click', function() {
+	    	if (!isMobileDevice()) {
+	    		controls.lock();
+	    	}
+	    });
+
+	    const keyboard = [];
+	    var playerY = camera.position.y;
+	    //let jumping = false;
+	    //tracks which keys are pressed
+	    addEventListener('keydown', (e)=>{
+	    	keyboard[e.key] = true;
+	    	
+	    });
+	    addEventListener('keyup', (e)=>{
+	    	if (e.key === ' ') {
+    camera.position.y = playerY;
+  }
+  keyboard[e.key] = false;
+
+	    });
+
+	    var jumpClock = 0;
+	    function processKeyboard(delta) {
+	    	const speed = 5;
+	    	var actualSpeed = speed * delta;
+	    	if (keyboard['w']){
+	    		controls.moveForward(actualSpeed);
+	    	}
+	    	if (keyboard['s']){
+	    		controls.moveForward(-actualSpeed);
+	    	}
+	    	if (keyboard['a']){
+	    		controls.moveRight(-actualSpeed);
+	    	}
+	    	if (keyboard['d']){
+	    		controls.moveRight(actualSpeed);
+	    	}
+	    	if (keyboard[' ']){
+	    		//console.log("yoyoy");
+    			const jumpHeight = 20;
+    			const jumpDuration = 0.2;
+    			
+    			const startY = 10;
+    			function jump(delta) {
+					jumpClock = jumpClock + delta;
+					console.log(delta);
+					console.log('jumpCLock = ' + jumpClock);
+					const jumpProgress = Math.sin(jumpClock);
+					console.log('jump progress' + jumpProgress);
+					
+					camera.position.y = startY + jumpHeight * jumpProgress;
+					if (jumpClock >= jumpDuration) {
+						camera.position.y = startY;
+						console.log("yoyoy");
+
+
+
+						//camera.position.y = startY;
+						//jumping = false;
+					}
+					
+				}
+			jumpClock = 0;
+			jump(delta);
+			
+			}
+	    	
+	    }
+
+	    //room loader
+	    const loader = new GLTFLoader();
+		loader.load('myRoom.glb', function(gltf) {
+    		const object = gltf.scene;
+    		object.scale.set(5,5,5);
+    		object.traverse((node) => {
+        		if (node.isMesh) {
+            		node.castShadow = true;
+            		node.receiveShadow = true;
+            		node.material.envMap = texture; // set envMap to the texture
+      				node.material.envMapIntensity = 1;
+        		}
+    		});
+    		scene.add(object);
+		}, undefined, function(error) {
+    		console.error(error);
+		});
+
+		loader.load('faceScan2.glb', function(g) {
+			const face = g.scene;
+    		face.scale.set(30,30,30);
+    		face.position.set(0, 8, -9);
+    		face.rotation.y = Math.PI;
+    		face.traverse((node) => {
+        		if (node.isMesh) {
+            		node.castShadow = true;
+            		node.receiveShadow = true;
+        		}
+    		});
+    		scene.add(face);
+		}, undefined, function(error) {
+    		console.error(error);
+		});
+
+		
+	   
+
+	    //directionalLight
+	    /*
+	    const light = new THREE.PointLight(0xffffff, 0.5, 100);
+	    light.position.set(15, 0, 15);
+	    scene.add(light);
+
+	    const light2 = new THREE.PointLight(0xffffff, 0.5, 100);
+	    light2.position.set(-15, 0, -15);
+	    scene.add(light2);
+	    */
+
+	    const light4 = new THREE.PointLight(0xffffff, 1, 100);
+	    light4.position.set(0, 20, 0);
+	    light4.castShadow = true;
+	    light4.shadow.mapSize.width = 2048;
+		light4.shadow.mapSize.height = 2048;
+		light4.shadow.bias = -0.0005;
+	    scene.add(light4);
+
+	    //light sphere
+	    var lightGeometry = new THREE.SphereGeometry(0.1, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
+		const lightMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff} );
+		var lightSphere = new THREE.Mesh(lightGeometry, lightMaterial);
+		lightSphere.position.set(0, 30, 0);
+	    scene.add(lightSphere);
+
+	    //middle sphere
+	    var sphereGeometry = new THREE.SphereGeometry(0.1, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
+	    var sphere = new THREE.Mesh(sphereGeometry, lightMaterial);
+	    sphere.position.set(0,10,0);
+	    sphere.castShadow = true;
+	    sphere.addEventListener('click', function() {
+	    	console.log('Sphere clicked!');
+  			window.location.href = 'index.html';
+		});
+	    scene.add(sphere);
+
+	    
+
+	    //plane?
+	    //const pGeometry = new THREE.BoxGeometry(500, 1, 500);
+	    const pGeometry = new THREE.CylinderGeometry(500, 500, 1, 20)
+		const pMaterial = new THREE.MeshStandardMaterial({color: 0x00ff00});
+		const plane = new THREE.Mesh(pGeometry, pMaterial);
+		plane.position.set(0, -0.8, 0);
+		plane.receiveShadow = true;
+		scene.add(plane);
+
+	    //ambientLight
+	    const light3 = new THREE.AmbientLight(0x404040);
+		scene.add(light3);
+
+		//directional light source
+		
+		
+		//gridHelper
+	    const gridHelper = new THREE.GridHelper(200, 50, 0xfc03d7, 0xffff00);
+		gridHelper.material.opacity = 0.5;
+		gridHelper.material.transparent = true;
+		scene.add(gridHelper);
+		//gridHelper.rotation.x = Math.PI/2;
+		//gridHelper.rotation.y = Math.PI/1;
+		
+	
+
+	    
+
+	    //animatiion
+	    function animate() {
+	    	requestAnimationFrame(animate);
+	    	const delta = clock.getDelta();
+	    	
+        
+	    	processKeyboard(delta);
+	   
+		    if (isMobileDevice()) {
+	    		controls.update();
+	    	}
+
+		    renderer.render(scene, camera);
+
+		}
+		
+
+		
+	    animate();
+	    //render();
+
+	    //window.addEventListener('mousemove', onMouseMove);
+
+  	</script>
+
+
+</body>
+</html>
