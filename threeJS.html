@@ -292,7 +292,7 @@ menuButton.addEventListener('click', toggleMenu);
 		loader.load('faceScan2.glb', function(g) {
 			const face = g.scene;
     		face.scale.set(30,30,30);
-    		face.position.set(0, 8, -14);
+    		face.position.set(0, 8, -22);
     		face.rotation.y = Math.PI;
     		face.traverse((node) => {
         		if (node.isMesh) {
