@@ -251,7 +251,7 @@
         		}
     		});
     		scene.add(face);
-
+/*
     		const update = () => {
 	    		const camVec = camera.position.clone().sub(face.position);
 
@@ -262,6 +262,22 @@
 	    		requestAnimationFrame(update);
   			};
   			update();
+  			*/
+		}, undefined, function(error) {
+    		console.error(error);
+		});
+
+		loader.load('about.glb', function(gltf2) {
+    		const about = gltf2.scene;
+    		about.scale.set(2,2,2);
+    		about.traverse((node) => {
+        		if (node.isMesh) {
+            		node.castShadow = true;
+            		node.receiveShadow = true;
+        		}
+    		});
+    		scene.add(about);
+    		about.position.set(0, 13, 0);
 		}, undefined, function(error) {
     		console.error(error);
 		});
@@ -384,6 +400,8 @@
 		    if (isMobileDevice()) {
 	    		controls.update();
 	    	}
+
+	    	//about.rotation.y += 0.1;
 
 		    renderer.render(scene, camera);
 		}
