@@ -17,21 +17,53 @@
     		position: absolute;
     		color: #0000ff;
     		top: 2rem;
+    		height: 1.2rem;
+    	}
+    	#button2 {
+    		position: absolute;
+    		color: #0000ff;
+    		top: 2rem;
+    		right: 3rem;
+    		z-index: 100;
+    		height: 1.2rem;
+    	}
+    	#menu {
+    		position: absolute;
+    		display: none;
+    		top: 3.2rem;
+    		right: 3rem;
+    		z-index: 99;
+    		border: 1px solid red;
+    		height: 16rem;
+    		width: 10rem;
+    		background-color: #ffffff;
+    	}
+    	#menu h1 {
+    		text-align: center;
+    		color: #0000ff;
+    		font-size: 1.2rem;
+    		
+
+    	}
+    	#menu p {
+    		text-align: center;
+    		color: #0000ff;
+    		font-size: 1rem;
+    		font-family: Lucida, monospace;
     	}
     	.crosshair {
     	  position: fixed;
     	  width: 3px;
     	  height: 20px;
     	  border: 1.5px solid red;
-    	  
     	}
     	.crosshair2 {
     	  position: fixed;
     	  width: 20px;
     	  height: 3px;
     	  border: 1.5px solid red;
-    	  
     	}
+
     	
 		@media only screen and (max-width: 1000px) {
 			canvas {
@@ -40,17 +72,33 @@
 			#button1 {
 				display: none;
 			}
+			#button2 {
+				display: none;
+			}
+			#menu {
+				display: none;
+			}
 			.crosshair {
 				display: none;
 			}
 			.crosshair2 {
 				display: none;
 			}
+
 		}
   	</style>
 </head>
 <body>
 	<button id="button1">CLICK FOR FIRST PERSON VIEW</button>
+	<button id="button2">actions</button>
+	<div id="menu">
+		<h1>movement</h1>
+		<p>w, a, s, d to move</p>
+		<p>e (SPEED BOOST)</p>
+		<p>Space (UP)</p>
+		<p>Shift (DOWN)</p>
+		<p>esc (TO ESCAPE, DUH)</p>
+	</div>
 	<div class = "crosshair"></div>
 	<div class = "crosshair2"></div>
 
@@ -62,8 +110,6 @@
 	    import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/GLTFLoader.js';
 	    import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/PointerLockControls.js';
 
-
-	    //init();
 	    
 	    //renderer
     	const renderer = new THREE.WebGLRenderer();
@@ -82,25 +128,6 @@
 	    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
 	    camera.position.set(3, 10, 3);
 
-	    
-
-	    	
-	    
-	    
-
-	    //renderer.domElement.addEventListener('mousemove', onMouseMove);
-//renderer.domElement.addEventListener('mouseleave', onMouseLeave);
-/*
-	    const textureLoader = new THREE.TextureLoader();
-		const texture = textureLoader.load('https://cdn.polyhaven.com/asset_img/primary/christmas_photo_studio_06.png?height=780', function(texture) {
-			texture.mapping = THREE.EquirectangularReflectionMapping;
-			texture.encoding = THREE.sRGBEncoding;
-		});
-
-		scene.background = texture;
-		scene.environment = texture;
-
-*/
 
 /*
 		const textureLoader = new THREE.TextureLoader();
@@ -116,26 +143,6 @@
 		scene.background = texture;
 		scene.environment = texture;
 */
-
-	    
-
-	    
-
-	    //orbit controls
-	    /*
-	    const controls = new OrbitControls(camera, renderer.domElement);
-	    controls.target.set(0, 10, 0);
-	    controls.autoRotate = true;
-	    controls.autoRotateSpeed = 0.5;
-	    controls.enableDamping = true;
-	    */
-	    //controls.maxDistance = 11;
-
-	    //controls.enablePan = false;
-
-	    
-
-
 	    
 	    //detects if mobile
 	    function isMobileDevice() {
@@ -163,9 +170,52 @@
 	    button.addEventListener('click', function() {
 	    	if (!isMobileDevice()) {
 	    		controls.lock();
-
 	    	}
 	    });
+
+	    const menuButton = document.querySelector('#button2');
+		const menuDiv = document.querySelector('#menu');
+		let clickCount = 1;
+		
+			menuDiv.style.display = 'none';
+			menuButton.addEventListener('click', function() {
+				clickCount++;
+
+				console.log('clickkkekke');
+				if (clickCount % 2 === 0) {
+											menuDiv.style.display = 'block';
+						} else {
+						menuDiv.style.display = 'none';
+					}
+
+				});
+		
+
+		
+		
+
+/*
+function toggleMenu() {
+	menuDiv.style.display = menuDiv.style.display === 'none' ? 'block' : 'none';
+}
+menuButton.addEventListener('click', toggleMenu);
+
+*/
+
+/*
+	    const menuButton = document.querySelector('#button2');
+	    const menu = document.querySelector('#menu');
+	    menuButton.addEventListener('click', function() {
+	    	if (!isMobileDevice()){
+  
+			  	if (menu.style.display === 'none') {
+			    	menu.style.display = 'block';
+			  	} else {
+			    	menu.style.display = 'none';
+			  	}
+	    	}
+	    });
+	    */
 
 	    const keyboard = [];
 	    var playerY = camera.position.y;
@@ -397,17 +447,8 @@
 */
 		//gridHelper
 	    const gridHelper = new THREE.GridHelper(60, 60, 0xfc03d7, 0xffff00);
-
 		gridHelper.material.opacity = 0.5;
 		gridHelper.material.transparent = true;
-		const lines = gridHelper.children.filter(child => child instanceof THREE.LineSegments);
-
-// Set the color of every 5th line to red
-lines.forEach((line, index) => {
-  if (index % 5 === 0) {
-    line.material.color.set(0xff0000);
-  }
-});
 		scene.add(gridHelper);
 
 		const gridHelper2 = gridHelper.clone();
@@ -425,6 +466,7 @@ lines.forEach((line, index) => {
 	    	const delta = clock.getDelta();
 
 	    	processKeyboard(delta);
+	    	
 	   
 		    if (isMobileDevice()) {
 	    		controls.update();
