@@ -242,7 +242,7 @@
 		loader.load('faceScan2.glb', function(g) {
 			const face = g.scene;
     		face.scale.set(30,30,30);
-    		face.position.set(0, 8, -9);
+    		face.position.set(0, 8, -11);
     		face.rotation.y = Math.PI;
     		face.traverse((node) => {
         		if (node.isMesh) {
@@ -269,7 +269,7 @@
 
 		loader.load('about.glb', function(gltf2) {
     		const about = gltf2.scene;
-    		about.scale.set(2,2,2);
+    		about.scale.set(0.5,0.5,0.5);
     		about.traverse((node) => {
         		if (node.isMesh) {
             		node.castShadow = true;
@@ -277,7 +277,17 @@
         		}
     		});
     		scene.add(about);
-    		about.position.set(0, 13, 0);
+    		about.position.set(0, 10, 0);
+    		const update = () => {
+	    		const camVec = camera.position.clone().sub(about.position);
+
+	    		const angle = Math.atan2(camVec.x, camVec.z);
+
+	    		about.rotation.y = angle;
+
+	    		requestAnimationFrame(update);
+  			};
+  			update();
 		}, undefined, function(error) {
     		console.error(error);
 		});
