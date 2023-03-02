@@ -152,6 +152,9 @@
 		    controls.enableDamping = true;
 	    } else {
 	    	controls = new PointerLockControls(camera, renderer.domElement);
+	    	controls.pointerSpeed = 1;
+	    	camera.lookAt(0, 9.5, 0);
+	    	//controls.movementSpeed = 5;
 	    }
 
 	    //click button for fps
@@ -160,6 +163,7 @@
 	    button.addEventListener('click', function() {
 	    	if (!isMobileDevice()) {
 	    		controls.lock();
+
 	    	}
 	    });
 
@@ -171,15 +175,17 @@
 	    	keyboard[e.key] = true;
 	    });
 	    addEventListener('keyup', (e)=>{
-	    	if (e.key === ' ') {
-    			camera.position.y = playerY;
-  			}
-  			keyboard[e.key] = false;
-	    });
+    if (e.key === 'e' ) {
+        keyboard['e'] = false;
+    } else {
+        keyboard[e.key] = false;
+    }
+});
 
 	    var jumpClock = 0;
+	    let speed = 6;
 	    function processKeyboard(delta) {
-	    	const speed = 6;
+	    	
 	    	var actualSpeed = speed * delta;
 	    	if (keyboard['w']){
 	    		controls.moveForward(actualSpeed);
@@ -187,39 +193,23 @@
 	    	if (keyboard['s']){
 	    		controls.moveForward(-actualSpeed);
 	    	}
-	    	if (keyboard['a']){
-	    		controls.moveRight(-actualSpeed);
-	    	}
 	    	if (keyboard['d']){
 	    		controls.moveRight(actualSpeed);
 	    	}
+	    	if (keyboard['a']){
+	    		controls.moveRight(-actualSpeed);
+	    	}
 	    	if (keyboard[' ']){
-	    		//console.log("yoyoy");
-    			const jumpHeight = 20;
-    			const jumpDuration = 0.2;
-    			
-    			const startY = 10;
-    			function jump(delta) {
-					jumpClock = jumpClock + delta;
-					console.log(delta);
-					console.log('jumpCLock = ' + jumpClock);
-					const jumpProgress = Math.sin(jumpClock);
-					console.log('jump progress' + jumpProgress);
-					
-					camera.position.y = startY + jumpHeight * jumpProgress;
-					if (jumpClock >= jumpDuration) {
-						camera.position.y = startY;
-						console.log("yoyoy");
-						//camera.position.y = startY;
-						//jumping = false;
-					}
-					
-				}
-			jumpClock = 0;
-			jump(delta);
-			
-			}
-	    	
+		        camera.position.y += 0.1;
+		    }
+		    if (keyboard['Shift']){
+		    	camera.position.y -= 0.1;
+		    }
+		    if (keyboard['e']){
+		        speed = 10;
+		    } else {
+		        speed = 6;
+		    }
 	    }
 
 	    //room loader
@@ -312,7 +302,18 @@
 		var lightSphere = new THREE.Mesh(lightGeometry, lightMaterial);
 		lightSphere.position.set(0, 30, 0);
 	    scene.add(lightSphere);
-
+/*
+	    const lightSphereClone = [];
+	    for (let i = 0; i < 5; i++){
+	    	//const lightSphereClone[] = lightSphere.clone();
+	    	lightSphereClone[i] = lightSphere.clone();
+		lightSphereClone[i].position.set(1+i, 9.9 , 0);
+		lightSphereClone[i].castShadow = true;
+		scene.add(lightSphereClone[i]);
+	    }
+	    
+		
+*/
 	    //middle sphere
 	    var sphereGeometry = new THREE.SphereGeometry(0.1, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
 	    var sphere = new THREE.Mesh(sphereGeometry, lightMaterial);
@@ -395,10 +396,27 @@
 		
 */
 		//gridHelper
-	    const gridHelper = new THREE.GridHelper(200, 50, 0xfc03d7, 0xffff00);
+	    const gridHelper = new THREE.GridHelper(60, 60, 0xfc03d7, 0xffff00);
+
 		gridHelper.material.opacity = 0.5;
 		gridHelper.material.transparent = true;
+		const lines = gridHelper.children.filter(child => child instanceof THREE.LineSegments);
+
+// Set the color of every 5th line to red
+lines.forEach((line, index) => {
+  if (index % 5 === 0) {
+    line.material.color.set(0xff0000);
+  }
+});
 		scene.add(gridHelper);
+
+		const gridHelper2 = gridHelper.clone();
+		gridHelper2.rotation.z = Math.PI/2;
+		scene.add(gridHelper2);
+
+		const gridHelper3 = gridHelper.clone();
+		gridHelper3.rotation.x = Math.PI/2;
+		scene.add(gridHelper3);
 		
 	    //animatiion / render
 	    function animate() {
