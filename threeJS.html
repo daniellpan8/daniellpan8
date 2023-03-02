@@ -110,6 +110,19 @@
 	    import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/GLTFLoader.js';
 	    import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/PointerLockControls.js';
 
+	    //detects if mobile
+	    function isMobileDevice() {
+    		return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+		}
+
+		let camera;
+		if (isMobileDevice()){
+			camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 1, 10000);
+		} else {
+			camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+		}
+		camera.position.set(3, 10, 3);
+		
 	    
 	    //renderer
     	const renderer = new THREE.WebGLRenderer();
@@ -125,8 +138,8 @@
 	    scene.background = new THREE.Color(0x87ceeb);
 
 	    //camera
-	    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
-	    camera.position.set(3, 10, 3);
+	    //const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+	    //camera.position.set(3, 10, 3);
 
 
 /*
@@ -144,10 +157,7 @@
 		scene.environment = texture;
 */
 	    
-	    //detects if mobile
-	    function isMobileDevice() {
-    		return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
-		}
+	    
 
 		//controls
 	    let controls;
