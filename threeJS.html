@@ -10,13 +10,27 @@
     		overflow: hidden;
     		display: flex;
   			justify-content: center;
-  			
+  			align-items: center;
     	}
     	canvas { width: 100%; height: 100%; }
     	#button1 {
     		position: absolute;
     		color: #0000ff;
     		top: 2rem;
+    	}
+    	.crosshair {
+    	  position: fixed;
+    	  width: 3px;
+    	  height: 20px;
+    	  border: 1.5px solid red;
+    	  
+    	}
+    	.crosshair2 {
+    	  position: fixed;
+    	  width: 20px;
+    	  height: 3px;
+    	  border: 1.5px solid red;
+    	  
     	}
     	
 		@media only screen and (max-width: 1000px) {
@@ -26,11 +40,19 @@
 			#button1 {
 				display: none;
 			}
+			.crosshair {
+				display: none;
+			}
+			.crosshair2 {
+				display: none;
+			}
 		}
   	</style>
 </head>
 <body>
 	<button id="button1">CLICK FOR FIRST PERSON VIEW</button>
+	<div class = "crosshair"></div>
+	<div class = "crosshair2"></div>
 
   	<script type="module">
 
@@ -40,20 +62,30 @@
 	    import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/GLTFLoader.js';
 	    import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/PointerLockControls.js';
 
-	    const renderer = new THREE.WebGLRenderer();
-	    renderer.setSize(window.innerWidth, window.innerHeight);
-	    
-	    
 
+	    //init();
+	    
+	    //renderer
+    	const renderer = new THREE.WebGLRenderer();
+	    renderer.setSize(window.innerWidth, window.innerHeight);
+	    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    	renderer.toneMappingExposure = 1.0;
+    	renderer.shadowMap.enabled = true;
+    	renderer.shadowMap.type = THREE.BasicShadowMap;
+    	document.body.appendChild(renderer.domElement);
+	    
+	    //scene
 	    const scene = new THREE.Scene();
 	    scene.background = new THREE.Color(0x87ceeb);
 
-
-	    //scene. fog = new THREE. Fog( 0xffffff, 0.015, 100 );
-
+	    //camera
 	    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
-	    
 	    camera.position.set(3, 10, 3);
+
+	    
+
+	    	
+	    
 	    
 
 	    //renderer.domElement.addEventListener('mousemove', onMouseMove);
@@ -87,11 +119,7 @@
 
 	    
 
-	    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-	    renderer.toneMappingExposure = 1.0;
-	    renderer.shadowMap.enabled = true;
-	    renderer.shadowMap.type = THREE.BasicShadowMap;
-	    document.body.appendChild(renderer.domElement);
+	    
 
 	    //orbit controls
 	    /*
@@ -104,14 +132,18 @@
 	    //controls.maxDistance = 11;
 
 	    //controls.enablePan = false;
-	    //fps
+
+	    
+
+
+	    
 	    //detects if mobile
 	    function isMobileDevice() {
     		return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
 		}
 
+		//controls
 	    let controls;
-
 	    if (isMobileDevice()) {
 	    	controls = new OrbitControls(camera, renderer.domElement);
 	    	controls.target.set(0, 10, 0);
@@ -122,10 +154,8 @@
 	    	controls = new PointerLockControls(camera, renderer.domElement);
 	    }
 
-	    
-	    //controls.lock();
+	    //click button for fps
 	    let clock = new THREE.Clock();
-
 	    const button = document.querySelector('#button1');
 	    button.addEventListener('click', function() {
 	    	if (!isMobileDevice()) {
@@ -139,19 +169,17 @@
 	    //tracks which keys are pressed
 	    addEventListener('keydown', (e)=>{
 	    	keyboard[e.key] = true;
-	    	
 	    });
 	    addEventListener('keyup', (e)=>{
 	    	if (e.key === ' ') {
-    camera.position.y = playerY;
-  }
-  keyboard[e.key] = false;
-
+    			camera.position.y = playerY;
+  			}
+  			keyboard[e.key] = false;
 	    });
 
 	    var jumpClock = 0;
 	    function processKeyboard(delta) {
-	    	const speed = 5;
+	    	const speed = 6;
 	    	var actualSpeed = speed * delta;
 	    	if (keyboard['w']){
 	    		controls.moveForward(actualSpeed);
@@ -182,9 +210,6 @@
 					if (jumpClock >= jumpDuration) {
 						camera.position.y = startY;
 						console.log("yoyoy");
-
-
-
 						//camera.position.y = startY;
 						//jumping = false;
 					}
@@ -206,8 +231,6 @@
         		if (node.isMesh) {
             		node.castShadow = true;
             		node.receiveShadow = true;
-            		//node.material.envMap = texture; // set envMap to the texture
-      				//node.material.envMapIntensity = 1;
         		}
     		});
     		scene.add(object);
@@ -215,6 +238,7 @@
     		console.error(error);
 		});
 
+		//face loader
 		loader.load('faceScan2.glb', function(g) {
 			const face = g.scene;
     		face.scale.set(30,30,30);
@@ -227,24 +251,26 @@
         		}
     		});
     		scene.add(face);
+
+    		const update = () => {
+	    		const camVec = camera.position.clone().sub(face.position);
+
+	    		const angle = Math.atan2(camVec.x, camVec.z);
+
+	    		face.rotation.y = angle;
+
+	    		requestAnimationFrame(update);
+  			};
+  			update();
 		}, undefined, function(error) {
     		console.error(error);
 		});
 
-		
-	   
+		//ambientLight
+	    const light3 = new THREE.AmbientLight(0x404040);
+		scene.add(light3);
 
-	    //directionalLight
-	    /*
-	    const light = new THREE.PointLight(0xffffff, 0.5, 100);
-	    light.position.set(15, 0, 15);
-	    scene.add(light);
-
-	    const light2 = new THREE.PointLight(0xffffff, 0.5, 100);
-	    light2.position.set(-15, 0, -15);
-	    scene.add(light2);
-	    */
-
+	    //point light
 	    const light4 = new THREE.PointLight(0xffffff, 1, 100);
 	    light4.position.set(0, 20, 0);
 	    light4.castShadow = true;
@@ -270,8 +296,34 @@
   			window.location.href = 'index.html';
 		});
 	    scene.add(sphere);
+	    //sphere.name = 'sphere';
 
-	    
+		renderer.domElement.addEventListener('mousedown', onDocumentMouseDown);
+
+		function onDocumentMouseDown(event) {
+		// Only respond to left mouse button clicks
+			if (event.button !== 0) return;
+
+			// Create a raycaster object
+			const raycaster = new THREE.Raycaster();
+
+			// Set the raycaster's origin to the center of the screen
+			const screenCenter = new THREE.Vector2(0, 0);
+			//screenCenter.add(crosshairPos);
+			raycaster.setFromCamera(screenCenter, camera);
+
+			// Check for intersections with the sphere
+			const intersectSphere = raycaster.intersectObject(sphere);
+			const intersectObj = raycaster.intersectObject(lightSphere);
+
+			// If the ray intersects with the sphere, redirect to another page
+			if (intersectSphere.length > 0) {
+				window.location.href = 'index.html';
+			}
+			if (intersectObj.length > 0) {
+				window.location.href = 'https://google.com';
+			}
+		}
 
 	    //plane?
 	    //const pGeometry = new THREE.BoxGeometry(500, 1, 500);
@@ -282,31 +334,51 @@
 		plane.receiveShadow = true;
 		scene.add(plane);
 
-	    //ambientLight
-	    const light3 = new THREE.AmbientLight(0x404040);
-		scene.add(light3);
+		/*
 
-		//directional light source
+		//cube?
+		const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+
+// Create a material for the cube
+		const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+
+	// Create a mesh object that combines the geometry and material
+		const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
+
+	// Add the mesh object to the scene
+		scene.add(cubeMesh);
+		cubeMesh.position.set(10,10,0);
+
+		const update = () => {
+    // Calculate the vector between the camera and the model
+    const camVec = camera.position.clone().sub(cubeMesh.position);
+
+    // Calculate the angle between the camera vector and the model's forward vector
+    const angle = Math.atan2(camVec.x, camVec.z);
+
+    // Rotate the model around the Y-axis to face the camera
+    cubeMesh.rotation.y = angle;
+
+    // Request the next frame update
+    requestAnimationFrame(update);
+  };
+
+  // Start the update loop
+  update();
 		
-		
+*/
 		//gridHelper
 	    const gridHelper = new THREE.GridHelper(200, 50, 0xfc03d7, 0xffff00);
 		gridHelper.material.opacity = 0.5;
 		gridHelper.material.transparent = true;
 		scene.add(gridHelper);
-		//gridHelper.rotation.x = Math.PI/2;
-		//gridHelper.rotation.y = Math.PI/1;
 		
-	
-
-	    
-
-	    //animatiion
+	    //animatiion / render
 	    function animate() {
 	    	requestAnimationFrame(animate);
+
 	    	const delta = clock.getDelta();
-	    	
-        
+
 	    	processKeyboard(delta);
 	   
 		    if (isMobileDevice()) {
@@ -314,18 +386,11 @@
 	    	}
 
 		    renderer.render(scene, camera);
-
 		}
 		
-
-		
 	    animate();
-	    //render();
-
-	    //window.addEventListener('mousemove', onMouseMove);
 
   	</script>
-
 
 </body>
 </html>
