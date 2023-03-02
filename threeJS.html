@@ -242,7 +242,7 @@
 		loader.load('faceScan2.glb', function(g) {
 			const face = g.scene;
     		face.scale.set(30,30,30);
-    		face.position.set(0, 8, -11);
+    		face.position.set(0, 8, -14);
     		face.rotation.y = Math.PI;
     		face.traverse((node) => {
         		if (node.isMesh) {
@@ -269,7 +269,7 @@
 
 		loader.load('about.glb', function(gltf2) {
     		const about = gltf2.scene;
-    		about.scale.set(0.5,0.5,0.5);
+    		about.scale.set(0.1,0.1,0.1);
     		about.traverse((node) => {
         		if (node.isMesh) {
             		node.castShadow = true;
@@ -315,7 +315,7 @@
 	    //middle sphere
 	    var sphereGeometry = new THREE.SphereGeometry(0.1, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
 	    var sphere = new THREE.Mesh(sphereGeometry, lightMaterial);
-	    sphere.position.set(0,10,0);
+	    sphere.position.set(0,8,0);
 	    sphere.castShadow = true;
 	    sphere.addEventListener('click', function() {
 	    	console.log('Sphere clicked!');
