@@ -423,6 +423,23 @@ menuButton.addEventListener('click', toggleMenu);
 		plane.receiveShadow = true;
 		scene.add(plane);
 
+		const pGeometry2 = new THREE.PlaneGeometry(26, 26);
+		const pMaterial2 = new THREE.MeshStandardMaterial({color: 0xfafafa});
+		const plane2 = new THREE.Mesh(pGeometry2, pMaterial2);
+		plane2.position.set(0, 15.2, 0);
+		plane2.receiveShadow = true;
+		plane2.rotation.x = Math.PI/2;
+		scene.add(plane2);
+
+		const pGeometry3 = new THREE.PlaneGeometry(8, 12);
+		const pMaterial3 = new THREE.MeshBasicMaterial({color: 0x000000});
+		const plane3 = new THREE.Mesh(pGeometry3, pMaterial3);
+		plane3.position.set(7, 6, 12.5);
+		plane3.receiveShadow = true;
+		plane3.rotation.x = Math.PI;
+		scene.add(plane3);
+
+
 		/*
 
 		//cube?
@@ -456,6 +473,9 @@ menuButton.addEventListener('click', toggleMenu);
   update();
 		
 */
+
+
+/*
 		//gridHelper
 	    const gridHelper = new THREE.GridHelper(60, 60, 0xfc03d7, 0xffff00);
 		gridHelper.material.opacity = 0.5;
@@ -470,6 +490,7 @@ menuButton.addEventListener('click', toggleMenu);
 		gridHelper3.rotation.x = Math.PI/2;
 		scene.add(gridHelper3);
 		
+*/
 	    //animatiion / render
 	    function animate() {
 	    	requestAnimationFrame(animate);
